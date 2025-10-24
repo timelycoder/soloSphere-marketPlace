@@ -21,18 +21,21 @@ const JobDetails = () => {
     max_price,
     deadline,
     description,
-    buyer_email,
+    buyer,
   } = job || {};
+
   const handleFormSubmission = async (e) => {
     e.preventDefault();
-    if (user?.email === buyer_email) return toast.error("Action not permitted");
+    if (user?.email === buyer?.email)
+      return toast.error("Action not permitted");
     const form = e.target;
     const jobId = _id;
     const price = parseFloat(form.price.value);
     if (price < parseFloat(min_price))
       return toast.error("offer more or at least equal or minimum price");
     const comment = form.comment.value;
-    const deadline = startDate;
+    // const deadline = startDate;
+    const deadline = startDate?.toISOString();
     const email = user?.email;
 
     const status = "pending";
@@ -45,8 +48,8 @@ const JobDetails = () => {
       job_title,
       category,
       email,
+      buyer_email: buyer?.email,
       status,
-      buyer_email,
     };
     try {
       const { data } = await axios.post(
@@ -66,7 +69,9 @@ const JobDetails = () => {
       <div className="flex-1  px-4 py-7 bg-white rounded-md shadow-md md:min-h-[350px]">
         <div className="flex items-center justify-between">
           <span className="text-sm font-light text-gray-800 ">
-            Deadline: {deadline}
+            {/* Deadline: {new Date(deadline).toLocaleDateString()} */}
+            Deadline:{" "}
+            {deadline ? new Date(deadline).toLocaleDateString() : "No deadline"}
           </span>
           <span className="px-4 py-1 text-xs text-blue-800 uppercase bg-blue-200 rounded-full ">
             {category}
@@ -84,13 +89,15 @@ const JobDetails = () => {
           </p>
           <div className="flex items-center gap-5">
             <div>
-              <p className="mt-2 text-sm  text-gray-600 ">Name: Jhankar Vai.</p>
               <p className="mt-2 text-sm  text-gray-600 ">
-                Email: jhankar@mahbub.com
+                Name: {buyer?.name}
+              </p>
+              <p className="mt-2 text-sm  text-gray-600 ">
+                Email: {buyer?.email}
               </p>
             </div>
             <div className="rounded-full object-cover overflow-hidden w-14 h-14">
-              <img src="" alt="" />
+              <img src={buyer?.photo} alt="" />
             </div>
           </div>
           <p className="mt-6 text-lg font-bold text-gray-600 ">
