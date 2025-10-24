@@ -11,7 +11,12 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <AuthProvider>
       <RouterProvider router={router}></RouterProvider>
-      <Toaster></Toaster>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          className: "bg-gray-800 text-white rounded-lg shadow-lg",
+        }}
+      />
     </AuthProvider>
   </StrictMode>
 );

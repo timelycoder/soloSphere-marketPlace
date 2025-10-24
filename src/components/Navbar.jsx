@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import logo from "../assets/images/logo.png";
+
 import { AuthContext } from "../provider/AuthContext";
 import { Link } from "react-router-dom";
 const Navbar = () => {
@@ -32,11 +33,11 @@ const Navbar = () => {
               role="button"
               className="btn btn-ghost btn-circle avatar"
             >
-              <div className="w-10 rounded-full" title="">
+              <div title={user?.displayName} className="w-10 rounded-full">
                 <img
                   referrerPolicy="no-referrer"
                   alt="User Profile Photo"
-                  src=""
+                  src={user?.photoURL}
                 />
               </div>
             </div>

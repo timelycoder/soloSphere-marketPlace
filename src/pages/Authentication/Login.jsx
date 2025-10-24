@@ -1,4 +1,6 @@
 import { useContext } from "react";
+import bgImg from "../../assets/images/login.jpg";
+import logo from "../../assets/images/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../provider/AuthContext";
 import toast from "react-hot-toast";
@@ -18,13 +20,33 @@ const Login = () => {
       toast.error(error?.message);
     }
   };
+  //////////////
+  //email password signin
+  const handleSignIn = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const email = form.email.value;
+    const pass = form.password.value;
+    console.log({ email, pass });
+
+    try {
+      //User login
+      const result = await signIn(email, pass);
+      console.log(result);
+      navigate("/");
+      toast.success("signIn succesful");
+    } catch (error) {
+      console.log(error);
+      toast.error(error?.mesage);
+    }
+  };
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-306px)] my-12">
       <div className="flex w-full max-w-sm mx-auto overflow-hidden bg-white rounded-lg shadow-lg  lg:max-w-4xl ">
         <div
           className="hidden bg-cover bg-center lg:block lg:w-1/2"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1606660265514-358ebbadc80d?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1575&q=80')`,
+            backgroundImage: `url('${bgImg}')`,
           }}
         ></div>
 
@@ -80,7 +102,7 @@ const Login = () => {
 
             <span className="w-1/5 border-b dark:border-gray-400 lg:w-1/4"></span>
           </div>
-          <form>
+          <form onSubmit={handleSignIn}>
             <div className="mt-4">
               <label
                 className="block mb-2 text-sm font-medium text-gray-600 "
