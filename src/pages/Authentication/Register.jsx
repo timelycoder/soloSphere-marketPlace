@@ -1,12 +1,14 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import bgImg from "../../assets/images/register.jpg";
 import logo from "../../assets/images/logo.png";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../provider/AuthContext";
 import toast from "react-hot-toast";
+import axios from "axios";
 
 const Register = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     user,
     setUser,
@@ -17,6 +19,19 @@ const Register = () => {
 
     updateUserProfile,
   } = useContext(AuthContext);
+  const from = location.state || "/";
+  // 🔴👇 এই useEffect যোগ করো
+  useEffect(() => {
+    if (user) {
+      navigate("/"); // যদি ইউজার লগইন থাকে, হোমে পাঠাও
+    }
+  }, [user, navigate]);
+  // 🟢 কারণ: ইউজার যদি ইতিমধ্যেই লগইন করা থাকে, তাহলে Register পেজে ঢোকার দরকার নেই।
+
+  // 🔴👇 এখানে একটি লাইন যোগ করো
+  if (user) return;
+  // 🟢 কারণ: পেজ লোড হওয়ার সময় অল্প সময়ের জন্য Register ফর্ম যেন না দেখা যায় যদি ইউজার লগইন থাকে।
+
   /// signup
 
   const handleSignUp = async (e) => {
@@ -32,8 +47,21 @@ const Register = () => {
       const result = await createUser(email, pass);
       console.log(result);
       await updateUserProfile(name, photo);
-      setUser({ ...user, photoURL: photo, displayName: name });
-      navigate("/");
+      //locally UI te  data dekhie dissi ata k bole optimistic update
+      setUser({ ...result?.user, photoURL: photo, displayName: name });
+      ////////////////////////
+      // cookies er jonno
+      console.log(result.user);
+      const { data } = await axios.post(
+        `${import.meta.env.VITE_API_URL}/jwt`,
+        {
+          email: result?.user?.email,
+        },
+        { withCredentials: true }
+      );
+      console.log(data);
+      //////////////////////
+      navigate(from, { replace: true });
       toast.success("signup successful");
     } catch (error) {
       console.log(error);
@@ -44,9 +72,20 @@ const Register = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      await signInWithGoogle();
+      const result = await signInWithGoogle();
+      //////////////////
+      console.log(result.user);
+      const { data } = await axios.post(
+        `${import.meta.env.VITE_API_URL}/jwt`,
+        {
+          email: result?.user?.email,
+        },
+        { withCredentials: true }
+      );
+      console.log(data);
+      /////////////////////
       toast.success("signIn successful");
-      navigate("/");
+      navigate(from, { replace: true });
     } catch (error) {
       console.log(error);
       toast.error(error?.message);

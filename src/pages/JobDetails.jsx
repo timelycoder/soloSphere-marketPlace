@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
 // import { AuthContext } from "../provider/AuthProvider";
 import axios from "axios";
 import DatePicker from "react-datepicker";
@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { AuthContext } from "../provider/AuthContext";
 
 const JobDetails = () => {
+  const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const [startDate, setStartDate] = useState(new Date());
   const job = useLoaderData();
@@ -38,7 +39,7 @@ const JobDetails = () => {
     const deadline = startDate?.toISOString();
     const email = user?.email;
 
-    const status = "pending";
+    const status = "Pending";
 
     const bidData = {
       jobId,
@@ -48,7 +49,12 @@ const JobDetails = () => {
       job_title,
       category,
       email,
-      buyer_email: buyer?.email,
+      // buyer_email: buyer?.email,
+      buyer: {
+        email: buyer?.email, // buyer object এর ভিতর email
+        name: buyer?.name,
+        photo: buyer?.photo,
+      },
       status,
     };
     try {
@@ -57,6 +63,8 @@ const JobDetails = () => {
         bidData
       );
       console.log(data);
+      toast.success("Bid Placed Successfully!");
+      navigate("/my-bids");
     } catch (error) {
       // console.log(error);
       // console.log("i am the error", error.message);
