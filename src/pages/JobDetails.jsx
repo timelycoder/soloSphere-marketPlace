@@ -1,18 +1,19 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useLoaderData, useNavigate } from "react-router-dom";
-// import { AuthContext } from "../provider/AuthProvider";
-import axios from "axios";
+
 import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
 import toast from "react-hot-toast";
-import { AuthContext } from "../provider/AuthContext";
+import useAuth from "../hooks/useAuth";
+import useAxiosSecure from "../hooks/useAxiosSecure";
 
 const JobDetails = () => {
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   const [startDate, setStartDate] = useState(new Date());
   const job = useLoaderData();
+  const axiosSecure = useAxiosSecure();
   // console.log(user, job);
   const {
     _id,
@@ -58,17 +59,16 @@ const JobDetails = () => {
       status,
     };
     try {
-      const { data } = await axios.post(
-        `${import.meta.env.VITE_API_URL}/bid`,
-        bidData
-      );
+      const { data } = await axiosSecure.post(`/bid`, bidData);
       console.log(data);
       toast.success("Bid Placed Successfully!");
       navigate("/my-bids");
     } catch (error) {
       // console.log(error);
       // console.log("i am the error", error.message);
-      console.log("source", error.stack);
+      const msg = error.response?.data?.message || "Failed to place bid!";
+      toast.error(msg);
+      e.target.reset();
     }
   };
   return (
@@ -129,6 +129,7 @@ const JobDetails = () => {
                 id="price"
                 type="text"
                 name="price"
+                required
                 className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md   focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring"
               />
             </div>

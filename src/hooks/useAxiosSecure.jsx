@@ -14,14 +14,14 @@ const useAxiosSecure = () => {
   // Response Interceptor
   axiosSecure.interceptors.response.use(
     (res) => {
-      console.log(
-        "response app aser age ami thamie dekheasi ki ase er vitor",
-        res
-      );
+      // console.log(
+      //   "response app aser age ami thamie dekheasi ki ase er vitor",
+      //   res
+      // );
       return res;
     },
     async (error) => {
-      console.log("error from axios interceptor", error.response);
+      console.log("error from axios interceptor ok", error.response);
       if (error.response.status === 401 || error.response.status === 403) {
         await logout();
         navigate("/login");

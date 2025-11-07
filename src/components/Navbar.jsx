@@ -20,6 +20,9 @@ const Navbar = () => {
           <li>
             <Link to="/">Home</Link>
           </li>
+          <li>
+            <Link to="/jobs">All Jobs</Link>
+          </li>
           {/* ইউজার না থাকলে দেখাবো */}
           {!user && (
             <li>

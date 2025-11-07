@@ -1,33 +1,51 @@
-import { useContext } from "react";
-import { useState } from "react";
-import { AuthContext } from "../provider/AuthContext";
-import axios from "axios";
-import { useEffect } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import useAxiosSecure from "../hooks/useAxiosSecure";
+import useAuth from "../hooks/useAuth";
+import toast from "react-hot-toast";
 const BidRequests = () => {
-  const { user } = useContext(AuthContext);
-  const [bids, setBids] = useState([]);
+  const axiosSecure = useAxiosSecure();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    getData();
-  }, [user]);
+  ///data get korar jono useQuery babohar kora hoy
+  const { data: bids = [], isLoading } = useQuery({
+    queryFn: () => getData(),
+    queryKey: ["bids", user?.email],
+  });
+  console.log(bids);
+  console.log(isLoading);
 
   const getData = async () => {
-    const { data } = await axios(
-      `${import.meta.env.VITE_API_URL}/bid-requests/${user?.email}`
-    );
-    setBids(data);
+    const { data } = await axiosSecure(`/bid-requests/${user?.email}`);
+
+    return data;
   };
+  const { mutateAsync } = useMutation({
+    mutationFn: async ({ id, status }) => {
+      const { data } = await axiosSecure.patch(`/bid/${id}`, { status });
+      console.log(data);
+    },
+    onSuccess: () => {
+      console.log("wow data updated");
+      toast.success("Updated");
+      //refresh ui for latest data
+      // refetch();
+      ///kothink kore refetch kora withouut refetch().susu refetch korle ai query ta refetch
+      //  hobe kintu queryClint dea korle pura application sobjay theke refetch hobe
+      queryClient.invalidateQueries({ queryKey: ["bids"] });
+    },
+  });
   //handleStatus
   const handleStatus = async (id, prevStatus, status) => {
     if (prevStatus === status) return console.log("ak bar hoise to r hobe na");
-    console.log(id, prevStatus, status);
-    const { data } = await axios.patch(
-      `${import.meta.env.VITE_API_URL}/bid/${id}`,
-      { status }
-    );
-    getData();
-    console.log(data);
+
+    await mutateAsync({ id, status });
   };
+  if (isLoading) return <p>Data is still loading</p>;
+  ///bujer jonno error liklam useQuery te isError o disstructure kora jay
+  // if (isError || error) {
+  //   console.log(isError, error);
+  // }
   return (
     <section className="container px-4 mx-auto pt-12">
       <div className="flex items-center gap-x-3">

@@ -7,10 +7,12 @@ import toast from "react-hot-toast";
 
 import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import useAxiosSecure from "../hooks/useAxiosSecure";
 const AddJob = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [startDate, setStartDate] = useState(new Date());
+  const axiosSecure = useAxiosSecure();
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -39,10 +41,7 @@ const AddJob = () => {
       },
     };
     try {
-      const { data } = await axios.post(
-        `${import.meta.env.VITE_API_URL}/job`,
-        jobData
-      );
+      const { data } = await axiosSecure.post(`$/job`, jobData);
       console.log(data);
       toast.success("job data added successfully");
       navigate("/my-posted-jobs");

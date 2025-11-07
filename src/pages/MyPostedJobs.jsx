@@ -23,9 +23,7 @@ const MyPostedJobs = () => {
   //   console.log(jobs);
   const handleDelete = async (id) => {
     try {
-      const { data } = await axiosSecure.delete(
-        `${import.meta.env.VITE_API_URL}/job/${id}`
-      );
+      const { data } = await axiosSecure.delete(`/job/${id}`);
       console.log(data);
       toast.success("Delete successful");
       getData(); //update data pawa jabe

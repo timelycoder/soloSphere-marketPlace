@@ -5,10 +5,10 @@ import { useState } from "react";
 import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
-// import { min } from "date-fns";
-import axios from "axios";
+
 import toast from "react-hot-toast";
 import { AuthContext } from "../provider/AuthContext";
+import useAxiosSecure from "../hooks/useAxiosSecure";
 
 const UpdateJob = () => {
   const navigate = useNavigate();
@@ -24,6 +24,7 @@ const UpdateJob = () => {
   } = job || {};
 
   const { user } = useContext(AuthContext);
+  const axiosSecure = useAxiosSecure();
   const initialDate = deadline ? new Date(deadline) : new Date();
 
   //   const [startDate, setStartDate] = useState(new Date(deadline) || new Date());
@@ -54,10 +55,7 @@ const UpdateJob = () => {
       buyer: { email, name: user?.displayName, photo: user?.photoURL },
     };
     try {
-      const { data } = await axios.put(
-        `${import.meta.env.VITE_API_URL}/job/${_id}`,
-        jobData
-      );
+      const { data } = await axiosSecure.put(`/job/${_id}`, jobData);
       console.log(data);
       if (data.modifiedCount > 0) {
         toast.success("Job updated successfully ");
